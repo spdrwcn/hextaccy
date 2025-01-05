@@ -1,34 +1,31 @@
-name: Deploy Pages
+name: Deploy to GitHub Pages
 
 on:
   push:
     branches:
-      - main
+      - main  # 默认情况下，GitHub Pages 使用 main 分支，但也可以是其他分支，如 gh-pages
 
 jobs:
-  pages:
+  build-and-deploy:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
+
     steps:
-      - uses: actions/checkout@v2
-      - name: Use Node.js 16.15.0
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: "16.x"
-      - name: Cache NPM dependencies
-        uses: actions/cache@v2
-        with:
-          path: node_modules
-          key: ${{ runner.OS }}-npm-cache
-          restore-keys: |
-            ${{ runner.OS }}-npm-cache
-      - name: Install Dependencies
+          node-version: '20' # 根据你的项目需求设置 Node.js 版本
+
+      - name: Install dependencies
         run: npm install
-      - name: Build
+
+      - name: Build project
         run: npm run build
-      - name: Deploy
+
+      - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
-          github_token: ${{ secrets.GITEE_TOKEN }}
-          publish_dir: ./dist
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist  # 根据你的项目构建输出目录修改
